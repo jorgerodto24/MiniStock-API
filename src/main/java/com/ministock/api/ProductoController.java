@@ -20,7 +20,7 @@ public class ProductoController {
     @GetMapping("/productos/{codigo}")
     public ResponseEntity<Producto> buscarProducto(@PathVariable String codigo) {
 
-        Producto producto = productoService.buscarProducto(codigo);
+        Producto producto = productoService.buscarProducto(codigo).orElse(null);
 
         if (producto != null) {
             return ResponseEntity.ok(producto);

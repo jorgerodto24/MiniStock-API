@@ -1,44 +1,45 @@
 
 package com.ministock.api;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductoService {
 
-    private final Map<String, Producto> productos = new HashMap<>();
+    private final ProductoRepository productoRepository;
 
-    public ProductoService() {
-        productos.put("P001", new Producto("P001", "Leche", 1.25, 20));
-        productos.put("P002", new Producto("P002", "Pan", 0.90, 15));
-        productos.put("P003", new Producto("P003", "Huevos", 2.50, 10));
+    public ProductoService(ProductoRepository productoRepository) {
+        this.productoRepository = productoRepository;
     }
 
-    public Producto buscarProducto(String codigo) {
-        return productos.get(codigo);
+    public Optional<Producto> buscarProducto(String codigo) {
+
+        return productoRepository.findById(codigo);
     }
 
-    public Collection<Producto> listarProductos() {
-        return productos.values();
+    public List<Producto> listarProductos() {
+        return productoRepository.findAll();
     }
 
     public boolean añadirProducto(Producto producto) {
 
-        if (productos.containsKey(producto.getCodigo())) {
+        if (productoRepository.existsById(producto.getCodigo())) {
             return false;
         } else {
-            productos.put(producto.getCodigo(), producto);
+            productoRepository.save(producto);
             return true;
         }
     }
 
     public boolean actualizarProducto(String codigo, Producto producto) {
-        if (productos.containsKey(codigo)) {
-            productos.replace(codigo, producto);
+
+        if (!codigo.equals(producto.getCodigo()))
+            return false;
+
+        if (productoRepository.existsById(codigo)) {
+            productoRepository.save(producto);
             return true;
         } else {
             return false;
@@ -46,8 +47,8 @@ public class ProductoService {
     }
 
     public boolean eliminarProducto(String codigo) {
-        if (productos.containsKey(codigo)) {
-            productos.remove(codigo);
+        if (productoRepository.existsById(codigo)) {
+            productoRepository.deleteById(codigo);
             return true;
         } else {
             return false;
